@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إدارة المنتجات</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+/* CSS */
+@import url('https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&display=swap');
+
+:root {
+--primary-color: #f75d35;
+--secondary-color: #fff;
+--bg-color: #f8f8f8;
+--text-color: #333;
+--gray-light: #eee;
+--gray-medium: #999;
+--red-color: #dc3545;
+}
+
+body {
+font-family: 'Almarai', sans-serif;
+margin: 0;
+padding: 0;
+background-color: var(--bg-color);
+direction: rtl;
+text-align: right;
+padding-bottom: 70px;
+}
+
+.bottom-navbar {
+position: fixed;
+bottom: 0;
+right: 0;
+left: 0;
+display: flex;
+justify-content: space-around;
+align-items: center;
+height: 60px;
+background-color: var(--secondary-color);
+box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+z-index: 1000;
+}
+
+.nav-item {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+text-decoration: none;
+color: var(--gray-medium);
+font-size: 0.8rem;
+transition: color 0.3s;
+}
+
+.nav-item i {
+font-size: 1.2rem;
+margin-bottom: 4px;
+}
+
+.nav-item:hover, .nav-item.active {
+color: var(--primary-color);
+}
+
+.main-content {
+padding: 20px;
+}
+
+h2 {
+text-align: center;
+color: var(--text-color);
+margin-bottom: 25px;
+}
+
+#products-list {
+display: flex;
+flex-direction: column;
+gap: 15px;
+}
+
+.product-item {
+display: flex;
+align-items: center;
+background-color: var(--secondary-color);
+padding: 15px;
+border-radius: 8px;
+box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+position: relative;
+}
+
+.product-item img {
+width: 70px;
+height: 70px;
+object-fit: cover;
+border-radius: 8px;
+margin-left: 15px;
+}
+
+.product-details {
+flex-grow: 1;
+}
+
+.product-details h4 {
+font-size: 1rem;
+margin: 0;
+color: var(--text-color);
+}
+
+.product-details p {
+font-size: 0.9rem;
+color: var(--gray-medium);
+margin: 5px 0 0;
+}
+
+.delete-btn {
+position: absolute;
+top: 10px;
+right: 10px;
+background: none;
+border: none;
+color: var(--red-color);
+font-size: 1.2rem;
+cursor: pointer;
+transition: transform 0.2s;
+}
+
+.delete-btn:hover {
+transform: scale(1.1);
+}
+
+.no-products-message {
+text-align: center;
+color: var(--gray-medium);
+font-size: 1.2rem;
+margin-top: 50px;
+}
+</style>
+</head>
+<body>
+
+<div class="bottom-navbar">
+<a href="reel.html" class="nav-item">
+<i class="fas fa-home"></i>
+<span>الرئيسية</span>
+</a>
+<a href="cart.html" class="nav-item">
+<i class="fas fa-shopping-cart"></i>
+<span>السلة</span>
+</a>
+<a href="notes.html" class="nav-item">
+<i class="fas fa-plus-circle"></i>
+<span>ملاحظة</span>
+</a>
+<a href="account.html" class="nav-item">
+<i class="fas fa-user"></i>
+<span>الحساب</span>
+</a>
+<a href="manage-products.html" class="nav-item active">
+<i class="fas fa-tools"></i>
+<span>إدارة</span>
+</a>
+</div>
+
+<div class="main-content">
+<h2>إدارة المنتجات</h2>
+
+<div id="products-list">
+</div>
+
+<p id="no-products-message" class="no-products-message" style="display: none;">لا توجد منتجات حاليًا لإدارتها.</p>
+</div>
+
+<script>
+// JavaScript
+document.addEventListener('DOMContentLoaded', () => {
+const productsListContainer = document.getElementById('products-list');
+const noProductsMessage = document.getElementById('no-products-message');
+
+const renderProducts = () => {
+const products = JSON.parse(localStorage.getItem('products')) || [];
+productsListContainer.innerHTML = '';
+
+if (products.length === 0) {
+noProductsMessage.style.display = 'block';
+} else {
+noProductsMessage.style.display = 'none';
+products.forEach(product => {
+const productItemDiv = document.createElement('div');
+productItemDiv.className = 'product-item';
+productItemDiv.innerHTML = `
+<img src="${product.images[0]}" alt="${product.name}">
+<div class="product-details">
+<h4>${product.name}</h4>
+<p>${product.price} JOD</p>
+</div>
+<button class="delete-btn" data-id="${product.id}">
+<i class="fas fa-times"></i>
+</button>
+`;
+productsListContainer.appendChild(productItemDiv);
+});
+}
+};
+
+const handleDeleteProduct = (productId) => {
+let products = JSON.parse(localStorage.getItem('products')) || [];
+const updatedProducts = products.filter(p => p.id != productId);
+localStorage.setItem('products', JSON.stringify(updatedProducts));
+
+// إعادة عرض القائمة المحدثة
+renderProducts();
+};
+
+// إضافة مُستمع للضغط على زر الحذف
+productsListContainer.addEventListener('click', (event) => {
+const target = event.target;
+if (target.closest('.delete-btn')) {
+const productId = target.closest('.delete-btn').dataset.id;
+if (confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
+handleDeleteProduct(productId);
+}
+}
+});
+
+// عرض المنتجات عند تحميل الصفحة
+renderProducts();
+});
+</script>
+</body>
+</html>
+	

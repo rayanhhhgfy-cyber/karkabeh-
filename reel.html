@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الصفحة الرئيسية</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+/* CSS */
+@import url('https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&display=swap');
+
+:root {
+--primary-color: #f75d35; /* لون برتقالي شبيه بـ SHEIN */
+--secondary-color: #fff;
+--bg-color: #f8f8f8;
+--text-color: #333;
+--gray-light: #eee;
+--gray-medium: #999;
+--red-color: #dc3545;
+}
+
+body {
+font-family: 'Almarai', sans-serif;
+margin: 0;
+padding: 0;
+background-color: var(--bg-color);
+direction: rtl;
+text-align: right;
+padding-bottom: 70px; /* مساحة للشريط السفلي */
+}
+
+/* الشريط السفلي للتنقل */
+.bottom-navbar {
+position: fixed;
+bottom: 0;
+right: 0;
+left: 0;
+display: flex;
+justify-content: space-around;
+align-items: center;
+height: 60px;
+background-color: var(--secondary-color);
+box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+z-index: 1000;
+}
+
+.nav-item {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+text-decoration: none;
+color: var(--gray-medium);
+font-size: 0.8rem;
+transition: color 0.3s;
+}
+
+.nav-item i {
+font-size: 1.2rem;
+margin-bottom: 4px;
+}
+
+.nav-item:hover, .nav-item.active {
+color: var(--primary-color);
+}
+
+.main-content {
+padding: 20px;
+padding-bottom: 80px; /* مسافة للنافبار */
+}
+
+/* شريط البحث */
+.search-bar {
+position: relative;
+display: flex;
+align-items: center;
+margin-bottom: 20px;
+}
+
+.search-bar input {
+width: 100%;
+padding: 12px 45px 12px 15px; /* مسافة للأيقونة */
+border: 1px solid var(--gray-light);
+border-radius: 50px;
+background-color: var(--secondary-color);
+box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+font-family: 'Almarai', sans-serif;
+font-size: 1rem;
+box-sizing: border-box;
+}
+
+.search-icon {
+position: absolute;
+left: 15px;
+color: var(--gray-medium);
+}
+
+/* بطاقة المنتج */
+.products-container {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+gap: 15px;
+}
+
+/* رسالة عدم وجود منتجات */
+.no-products-message {
+text-align: center;
+color: var(--gray-medium);
+font-size: 1.2rem;
+margin-top: 50px;
+}
+
+/* تنسيقات بطاقة المنتج الجديدة */
+.product-card {
+background-color: var(--secondary-color);
+border-radius: 8px;
+overflow: hidden;
+box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+text-align: right;
+position: relative;
+text-decoration: none;
+color: inherit;
+}
+
+.product-card .image-container {
+position: relative;
+width: 100%;
+padding-top: 100%;
+overflow: hidden;
+}
+
+.product-image {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+object-fit: cover;
+display: block;
+}
+
+.product-details {
+padding: 10px;
+}
+
+.product-name {
+font-size: 0.9rem;
+color: var(--text-color);
+margin: 5px 0;
+line-height: 1.3;
+}
+
+.product-rating {
+font-size: 0.8rem;
+margin: 5px 0;
+display: flex;
+align-items: center;
+flex-wrap: wrap;
+}
+
+.product-rating .stars {
+color: gold;
+}
+
+.product-rating .sales-count {
+color: var(--gray-medium);
+margin-right: 5px;
+}
+
+.product-price {
+font-size: 1.2rem;
+font-weight: bold;
+color: var(--primary-color);
+margin: 5px 0;
+display: flex;
+align-items: center;
+flex-wrap: wrap;
+}
+
+.product-price .original-price {
+font-size: 0.8rem;
+color: var(--gray-medium);
+text-decoration: line-through;
+margin-right: 5px;
+}
+
+.product-price .discount {
+background-color: var(--red-color);
+color: var(--secondary-color);
+padding: 2px 5px;
+font-size: 0.7rem;
+border-radius: 3px;
+}
+
+.product-info-row {
+display: flex;
+align-items: center;
+margin-top: 5px;
+color: var(--gray-medium);
+font-size: 0.8rem;
+}
+
+.product-info-row i {
+margin-left: 5px;
+}
+</style>
+</head>
+<body>
+
+<div class="bottom-navbar">
+<a href="reel.html" class="nav-item active">
+<i class="fas fa-home"></i>
+<span>الرئيسية</span>
+</a>
+<a href="cart.html" class="nav-item">
+<i class="fas fa-shopping-cart"></i>
+<span>السلة</span>
+</a>
+<a href="notes.html" class="nav-item">
+<i class="fas fa-plus-circle"></i>
+<span>ملاحظة</span>
+</a>
+<a href="account.html" class="nav-item">
+<i class="fas fa-user"></i>
+<span>الحساب</span>
+</a>
+</div>
+
+<div class="main-content">
+<div class="search-bar">
+<input type="text" placeholder="ابحث عن منتج...">
+<i class="fas fa-search search-icon"></i>
+</div>
+
+<div class="products-container" id="products-container">
+</div>
+
+<p class="no-products-message" id="no-products-message">لا توجد منتجات حاليًا.</p>
+</div>
+
+<script>
+// JavaScript
+document.addEventListener('DOMContentLoaded', () => {
+
+const productContainer = document.getElementById('products-container');
+const noProductsMessage = document.getElementById('no-products-message');
+
+// قائمة المنتجات. يتم جلبها من localStorage
+const products = JSON.parse(localStorage.getItem('products')) || [];
+
+// العملات
+const currencies = {
+JOD: 1,
+USD: 1.41,
+EUR: 1.30
+};
+
+// وظيفة لعرض المنتجات
+const renderProducts = (currentCurrency) => {
+if (products.length === 0) {
+noProductsMessage.style.display = 'block';
+productContainer.innerHTML = '';
+return;
+}
+
+noProductsMessage.style.display = 'none';
+productContainer.innerHTML = '';
+products.forEach(product => {
+const convertedPrice = (product.price * currencies[currentCurrency]).toFixed(2);
+
+// إنشاء النجوم بشكل ديناميكي
+const stars = [];
+const rating = parseFloat(product.rating);
+for (let i = 0; i < 5; i++) {
+if (i < Math.floor(rating)) {
+stars.push('<i class="fas fa-star"></i>');
+} else if (i === Math.floor(rating) && rating % 1 !== 0) {
+stars.push('<i class="fas fa-star-half-alt"></i>');
+} else {
+stars.push('<i class="far fa-star"></i>');
+}
+}
+
+productContainer.innerHTML += `
+<a href="product-details.html?id=${product.id}" class="product-card">
+<div class="image-container">
+<img src="${product.images[0]}" alt="${product.name}" class="product-image">
+</div>
+<div class="product-details">
+<h4 class="product-name">${product.name}</h4>
+<div class="product-rating">
+<span class="stars">${stars.join('')}</span>
+<span class="sales-count">(+${product.sales > 1000 ? '1k' : product.sales})</span>
+</div>
+<div class="product-price">
+<span>${convertedPrice} ${currentCurrency}</span>
+<span class="original-price">${(product.price * 1.2 * currencies[currentCurrency]).toFixed(2)} ${currentCurrency}</span>
+</div>
+<div class="product-info-row">
+<i class="fas fa-truck"></i>
+<span>شحن مجاني لبعض المناطق</span>
+</div>
+</div>
+</a>
+`;
+});
+};
+
+// تحميل العملة المحفوظة وعرض المنتجات
+const currentCurrency = localStorage.getItem('currentCurrency') || 'JOD';
+renderProducts(currentCurrency);
+
+// يمكنك هنا إضافة وظائف أخرى مثل البحث
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+const productGrid = document.getElementById('productGrid');
+const searchInput = document.getElementById('searchInput');
+const emptyResultsMessage = document.getElementById('emptyResultsMessage');
+
+// وظيفة لجلب المنتجات من الذاكرة المحلية
+const getAllProducts = () => {
+const products = JSON.parse(localStorage.getItem('products')) || [];
+return products;
+};
+
+// وظيفة لعرض المنتجات
+const renderProducts = (productsToRender) => {
+productGrid.innerHTML = ''; // مسح المحتوى الحالي
+
+if (productsToRender.length === 0) {
+emptyResultsMessage.style.display = 'block';
+} else {
+emptyResultsMessage.style.display = 'none';
+productsToRender.forEach(product => {
+const productCard = document.createElement('a');
+productCard.className = 'product-card';
+productCard.href = `product-details.html?id=${product.id}`;
+productCard.innerHTML = `
+<img src="${product.images[0]}" alt="${product.name}">
+<div class="product-info">
+<h3>${product.name}</h3>
+<p>${product.price} JOD</p>
+</div>
+`;
+productGrid.appendChild(productCard);
+});
+}
+};
+
+// وظيفة البحث
+const searchProducts = () => {
+const query = searchInput.value.toLowerCase();
+const allProducts = getAllProducts();
+
+const filteredProducts = allProducts.filter(product => {
+const productName = product.name ? product.name.toLowerCase() : '';
+const productDescription = product.description ? product.description.toLowerCase() : '';
+
+return productName.includes(query) || productDescription.includes(query);
+});
+
+renderProducts(filteredProducts);
+};
+
+// إضافة مستمع للحدث على شريط البحث
+searchInput.addEventListener('input', searchProducts);
+
+// عرض جميع المنتجات عند تحميل الصفحة لأول مرة
+renderProducts(getAllProducts());
+});
+
+
+</script>
+	
+
+</body>
+</html>

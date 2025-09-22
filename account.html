@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حسابي</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+/* CSS */
+@import url('https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&display=swap');
+
+:root {
+--primary-color: #007BFF;
+--primary-light: #e6f2ff;
+--secondary-color: #fff;
+--bg-color: #f0f2f5;
+--text-color: #333;
+--text-muted: #666;
+--red-color: #dc3545;
+}
+
+body {
+font-family: 'Almarai', sans-serif;
+margin: 0;
+padding: 0;
+background-color: var(--bg-color);
+direction: rtl;
+text-align: right;
+padding-bottom: 70px;
+}
+
+.bottom-navbar {
+position: fixed;
+bottom: 0;
+right: 0;
+left: 0;
+display: flex;
+justify-content: space-around;
+align-items: center;
+height: 60px;
+background-color: var(--secondary-color);
+box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+z-index: 1000;
+}
+
+.nav-item {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+text-decoration: none;
+color: var(--text-muted);
+font-size: 0.8rem;
+transition: color 0.3s;
+}
+
+.nav-item i {
+font-size: 1.2rem;
+margin-bottom: 4px;
+}
+
+.nav-item.active, .nav-item:hover {
+color: var(--primary-color);
+}
+
+.main-content {
+padding: 20px;
+}
+
+.account-header {
+text-align: center;
+padding: 20px 0;
+}
+
+.profile-container {
+position: relative;
+display: inline-block;
+width: 120px;
+height: 120px;
+border-radius: 50%;
+border: 3px solid var(--primary-color);
+overflow: hidden;
+cursor: pointer;
+transition: transform 0.3s;
+}
+
+.profile-container:hover {
+transform: scale(1.05);
+}
+
+.profile-pic {
+width: 100%;
+height: 100%;
+object-fit: cover;
+}
+
+.profile-pic-overlay {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-color: rgba(0, 0, 0, 0.5);
+display: flex;
+justify-content: center;
+align-items: center;
+opacity: 0;
+transition: opacity 0.3s;
+}
+
+.profile-container:hover .profile-pic-overlay {
+opacity: 1;
+}
+
+.profile-pic-overlay i {
+color: var(--secondary-color);
+font-size: 2rem;
+}
+
+.user-info {
+margin-top: 15px;
+}
+
+.user-info h3 {
+margin: 0;
+font-size: 1.5rem;
+color: var(--text-color);
+}
+
+.user-info p {
+margin: 5px 0 0;
+font-size: 0.9rem;
+color: var(--text-muted);
+}
+
+.account-options-section {
+background-color: var(--secondary-color);
+padding: 10px;
+border-radius: 12px;
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+margin-top: 20px;
+}
+
+.option-item {
+display: flex;
+align-items: center;
+padding: 15px 10px;
+border-bottom: 1px solid var(--bg-color);
+cursor: pointer;
+transition: background-color 0.2s;
+position: relative; /* لإضافة القائمة المنسدلة */
+}
+
+.option-item:last-child {
+border-bottom: none;
+}
+
+.option-item:hover {
+background-color: var(--bg-color);
+}
+
+.option-icon {
+color: var(--primary-color);
+font-size: 1.2rem;
+width: 30px;
+text-align: center;
+}
+
+.option-text {
+flex-grow: 1;
+font-size: 1rem;
+color: var(--text-color);
+font-weight: 500;
+margin-right: 15px;
+}
+
+.option-arrow {
+color: var(--text-muted);
+}
+
+.logout-btn {
+width: 100%;
+padding: 15px;
+margin-top: 20px;
+background-color: var(--red-color);
+color: white;
+border: none;
+border-radius: 10px;
+font-size: 1rem;
+font-weight: bold;
+cursor: pointer;
+transition: background-color 0.3s;
+}
+.logout-btn:hover {
+background-color: #c82333;
+}
+
+/* القائمة المنسدلة */
+.dropdown-menu {
+position: absolute;
+bottom: -5px; /* يظهر فوق الزر */
+right: 100%;
+width: 150px;
+background-color: var(--secondary-color);
+border-radius: 8px;
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+list-style: none;
+padding: 8px;
+margin: 0;
+z-index: 500;
+display: none;
+}
+
+.dropdown-menu li {
+padding: 10px 12px;
+cursor: pointer;
+border-radius: 6px;
+transition: background-color 0.2s;
+}
+
+.dropdown-menu li:hover {
+background-color: var(--bg-color);
+}
+</style>
+</head>
+<body>
+
+<div class="bottom-navbar">
+<a href="reel.html" class="nav-item">
+<i class="fas fa-home"></i>
+<span>الرئيسية</span>
+</a>
+<a href="cart.html" class="nav-item">
+<i class="fas fa-shopping-cart"></i>
+<span>السلة</span>
+</a>
+<a href="notes.html" class="nav-item">
+<i class="fas fa-plus-circle"></i>
+<span>ملاحظة</span>
+</a>
+<a href="account.html" class="nav-item active">
+<i class="fas fa-user"></i>
+<span>الحساب</span>
+</a>
+</div>
+
+<div class="main-content">
+<div class="account-header">
+<div class="profile-container" id="profilePicContainer">
+<img src="https://via.placeholder.com/150/f0f2f5/a8aeb2?text=صورة" alt="صورة الملف الشخصي" class="profile-pic" id="profilePic">
+<div class="profile-pic-overlay">
+<i class="fas fa-camera"></i>
+</div>
+<input type="file" id="profilePicInput" accept="image/*" style="display:none;">
+</div>
+<div class="user-info">
+<h3 id="userNameDisplay">الاسم</h3>
+<p id="userEmailDisplay">البريد الإلكتروني</p>
+</div>
+</div>
+
+<div class="account-options-section">
+<div class="option-item" id="changeNameBtn">
+<i class="fas fa-pen option-icon"></i>
+<span class="option-text">تغيير الاسم</span>
+<i class="fas fa-chevron-left option-arrow"></i>
+</div>
+<div class="option-item" id="changeLangBtn">
+<i class="fas fa-globe option-icon"></i>
+<span class="option-text">تغيير اللغة</span>
+<i class="fas fa-chevron-left option-arrow"></i>
+<ul class="dropdown-menu" id="langDropdown">
+<li data-lang="ar">العربية</li>
+<li data-lang="en">English</li>
+</ul>
+</div>
+<div class="option-item" id="changeCurrencyBtn">
+<i class="fas fa-dollar-sign option-icon"></i>
+<span class="option-text">تغيير العملة</span>
+<i class="fas fa-chevron-left option-arrow"></i>
+<ul class="dropdown-menu" id="currencyDropdown">
+<li data-currency="JOD">دينار أردني (JOD)</li>
+<li data-currency="USD">دولار أمريكي (USD)</li>
+<li data-currency="EUR">يورو (EUR)</li>
+</ul>
+</div>
+</div>
+
+<div class="account-options-section" id="adminOptions" style="display:none;">
+<a href="add.html" class="option-item" id="addProductBtn">
+<i class="fas fa-plus-circle option-icon"></i>
+<span class="option-text">إضافة منتج</span>
+<i class="fas fa-chevron-left option-arrow"></i>
+</a>
+<a href="man.html" class="option-item" id="manageOrdersBtn">
+<i class="fas fa-tasks option-icon"></i>
+<span class="option-text">إدارة الطلبات</span>
+<i class="fas fa-chevron-left option-arrow"></i>
+</a>
+<a href="manage.html" class="option-item" id="manageProductsBtn">
+<i class="fas fa-boxes option-icon"></i>
+<span class="option-text">إدارة المنتجات</span>
+<i class="fas fa-chevron-left option-arrow"></i>
+</a>
+</div>
+
+<button class="logout-btn" id="logoutBtn">
+<i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+</button>
+</div>
+
+<script>
+// JavaScript
+document.addEventListener('DOMContentLoaded', () => {
+const userProfileName = document.getElementById('userNameDisplay');
+const userProfileEmail = document.getElementById('userEmailDisplay');
+const profilePicContainer = document.getElementById('profilePicContainer');
+const profilePicInput = document.getElementById('profilePicInput');
+const profilePic = document.getElementById('profilePic');
+const adminOptionsDiv = document.getElementById('adminOptions');
+const logoutBtn = document.getElementById('logoutBtn');
+const changeNameBtn = document.getElementById('changeNameBtn');
+const changeLangBtn = document.getElementById('changeLangBtn');
+const changeCurrencyBtn = document.getElementById('changeCurrencyBtn');
+const langDropdown = document.getElementById('langDropdown');
+const currencyDropdown = document.getElementById('currencyDropdown');
+
+// بيانات الأدمن (تأكد من مطابقتها مع ملف login.html)
+const adminCredentials = {
+email: 'admin@gmail.com',
+password: 'ad'
+};
+
+// العملات
+const currencies = {
+JOD: 1,
+USD: 1.41,
+EUR: 1.30
+};
+
+// وظيفة لتحديد المستخدم الحالي
+const setUserInfo = () => {
+const storedUser = JSON.parse(localStorage.getItem('userAccount'));
+const lastLoggedInEmail = localStorage.getItem('lastLoggedInEmail');
+
+if (lastLoggedInEmail === adminCredentials.email) {
+userProfileName.textContent = 'المسؤول';
+userProfileEmail.textContent = adminCredentials.email;
+if (adminOptionsDiv) adminOptionsDiv.style.display = 'block';
+} else if (storedUser && storedUser.email === lastLoggedInEmail) {
+userProfileName.textContent = storedUser.fullName || 'مستخدم جديد';
+userProfileEmail.textContent = storedUser.email;
+if (adminOptionsDiv) adminOptionsDiv.style.display = 'none';
+} else {
+userProfileName.textContent = 'زائر';
+userProfileEmail.textContent = 'يرجى تسجيل الدخول';
+if (adminOptionsDiv) adminOptionsDiv.style.display = 'none';
+}
+};
+
+// وظيفة لإظهار القائمة المنسدلة
+const showDropdown = (dropdown) => {
+document.querySelectorAll('.dropdown-menu').forEach(menu => {
+if (menu !== dropdown) {
+menu.style.display = 'none';
+}
+});
+dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+};
+
+// وظيفة لتغيير اللغة
+const changeLanguage = (langCode) => {
+document.documentElement.setAttribute('lang', langCode);
+document.documentElement.setAttribute('dir', langCode === 'ar' ? 'rtl' : 'ltr');
+alert('تم تغيير اللغة.');
+window.location.reload();
+};
+
+// وظيفة لتغيير العملة
+const changeCurrency = (currencyCode) => {
+localStorage.setItem('currentCurrency', currencyCode);
+alert(`تم تغيير العملة إلى ${currencyCode}`);
+window.location.reload();
+};
+
+// وظيفة لتغيير الاسم
+const changeUserName = () => {
+const newName = prompt("أدخل الاسم الجديد:");
+if (newName) {
+let storedUser = JSON.parse(localStorage.getItem('userAccount'));
+if (storedUser && storedUser.email === localStorage.getItem('lastLoggedInEmail')) {
+storedUser.fullName = newName;
+localStorage.setItem('userAccount', JSON.stringify(storedUser));
+setUserInfo();
+alert('تم تغيير اسم المستخدم بنجاح!');
+} else {
+alert('لا يمكن تغيير الاسم، يرجى تسجيل الدخول أولاً.');
+}
+}
+};
+
+// وظيفة لتغيير صورة البروفايل
+const changeProfilePic = () => {
+profilePicInput.click();
+};
+
+// وظيفة تسجيل الخروج
+const logout = () => {
+localStorage.removeItem('userAccount');
+localStorage.removeItem('lastLoggedInEmail');
+localStorage.removeItem('profilePicture');
+alert('تم تسجيل الخروج بنجاح.');
+window.location.href = 'login.html';
+};
+
+const savedProfilePic = localStorage.getItem('profilePicture');
+if (savedProfilePic) {
+profilePic.src = savedProfilePic;
+}
+
+setUserInfo();
+
+if (logoutBtn) logoutBtn.addEventListener('click', logout);
+if (changeNameBtn) changeNameBtn.addEventListener('click', changeUserName);
+
+// وظيفة إظهار قائمة اللغة
+if (changeLangBtn) changeLangBtn.addEventListener('click', (e) => {
+e.stopPropagation();
+showDropdown(langDropdown);
+});
+// وظيفة اختيار اللغة
+if (langDropdown) langDropdown.addEventListener('click', (e) => {
+const lang = e.target.dataset.lang;
+if (lang) {
+changeLanguage(lang);
+}
+});
+
+// وظيفة إظهار قائمة العملة
+if (changeCurrencyBtn) changeCurrencyBtn.addEventListener('click', (e) => {
+e.stopPropagation();
+showDropdown(currencyDropdown);
+});
+// وظيفة اختيار العملة
+if (currencyDropdown) currencyDropdown.addEventListener('click', (e) => {
+const currency = e.target.dataset.currency;
+if (currency) {
+changeCurrency(currency);
+}
+});
+
+if (profilePicContainer) profilePicContainer.addEventListener('click', changeProfilePic);
+if (profilePicInput) profilePicInput.addEventListener('change', (event) => {
+const file = event.target.files[0];
+if (file) {
+const reader = new FileReader();
+reader.onload = e => {
+profilePic.src = e.target.result;
+localStorage.setItem('profilePicture', e.target.result);
+};
+reader.readAsDataURL(file);
+}
+});
+
+document.addEventListener('click', (e) => {
+if (!e.target.closest('.option-item')) {
+document.querySelectorAll('.dropdown-menu').forEach(menu => {
+menu.style.display = 'none';
+});
+}
+});
+});
+</script>
+</body>
+</html>
+	

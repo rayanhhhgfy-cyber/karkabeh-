@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سلة المشتريات</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+/* CSS */
+@import url('https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&display=swap');
+
+:root {
+--primary-color: #f75d35;
+--secondary-color: #fff;
+--bg-color: #f8f8f8;
+--text-color: #333;
+--gray-light: #eee;
+--gray-medium: #999;
+--red-color: #dc3545;
+}
+
+body {
+font-family: 'Almarai', sans-serif;
+margin: 0;
+padding: 0;
+background-color: var(--bg-color);
+direction: rtl;
+text-align: right;
+padding-bottom: 70px;
+}
+
+.bottom-navbar {
+position: fixed;
+bottom: 0;
+right: 0;
+left: 0;
+display: flex;
+justify-content: space-around;
+align-items: center;
+height: 60px;
+background-color: var(--secondary-color);
+box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+z-index: 1000;
+}
+
+.nav-item {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+text-decoration: none;
+color: var(--gray-medium);
+font-size: 0.8rem;
+transition: color 0.3s;
+}
+
+.nav-item i {
+font-size: 1.2rem;
+margin-bottom: 4px;
+}
+
+.nav-item:hover, .nav-item.active {
+color: var(--primary-color);
+}
+
+.main-content {
+padding: 20px;
+}
+
+h2 {
+text-align: center;
+color: var(--text-color);
+margin-bottom: 25px;
+}
+
+#cart-items-container {
+display: flex;
+flex-direction: column;
+gap: 15px;
+}
+
+.cart-item {
+display: flex;
+background-color: var(--secondary-color);
+padding: 15px;
+border-radius: 8px;
+box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+align-items: flex-start;
+position: relative;
+}
+
+.cart-item-image {
+width: 80px;
+height: 80px;
+object-fit: cover;
+border-radius: 8px;
+margin-left: 15px;
+}
+
+.cart-item-details {
+flex-grow: 1;
+display: flex;
+flex-direction: column;
+justify-content: space-between;
+}
+
+.cart-item-name {
+font-weight: bold;
+font-size: 1rem;
+color: var(--text-color);
+margin-bottom: 5px;
+}
+
+.cart-item-price {
+color: var(--primary-color);
+font-weight: bold;
+margin-bottom: 10px;
+}
+
+.quantity-control {
+display: flex;
+align-items: center;
+font-size: 1.1rem;
+}
+
+.quantity-btn {
+background-color: var(--gray-light);
+border: none;
+width: 30px;
+height: 30px;
+border-radius: 50%;
+cursor: pointer;
+transition: background-color 0.2s;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+.quantity-btn:hover {
+background-color: var(--gray-medium);
+color: var(--secondary-color);
+}
+
+.quantity-display {
+width: 40px;
+text-align: center;
+margin: 0 5px;
+font-size: 1rem;
+}
+
+.remove-btn {
+position: absolute;
+top: 10px;
+left: 10px;
+background: none;
+border: none;
+color: var(--gray-medium);
+font-size: 1.2rem;
+cursor: pointer;
+transition: color 0.2s;
+}
+
+.remove-btn:hover {
+color: var(--red-color);
+}
+
+#cart-summary {
+background-color: var(--secondary-color);
+padding: 20px;
+border-radius: 8px;
+margin-top: 20px;
+box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+#cart-summary p {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin: 5px 0;
+}
+
+#cart-summary .total-price {
+font-size: 1.2rem;
+font-weight: bold;
+color: var(--primary-color);
+border-top: 1px dashed var(--gray-light);
+padding-top: 10px;
+margin-top: 10px;
+}
+
+.checkout-btn {
+width: 100%;
+padding: 15px;
+background-color: var(--primary-color);
+color: var(--secondary-color);
+border: none;
+border-radius: 50px;
+font-size: 1.1rem;
+font-weight: bold;
+cursor: pointer;
+transition: background-color 0.3s;
+margin-top: 20px;
+}
+
+.no-items-message {
+text-align: center;
+color: var(--gray-medium);
+font-size: 1.2rem;
+margin-top: 50px;
+}
+
+/* تنسيقات النافذة المنبثقة (Modal) */
+.modal {
+display: none;
+position: fixed;
+z-index: 2000;
+left: 0;
+top: 0;
+width: 100%;
+height: 100%;
+overflow: auto;
+background-color: rgba(0, 0, 0, 0.6);
+padding-top: 60px;
+}
+
+.modal-content {
+background-color: var(--secondary-color);
+margin: 5% auto;
+padding: 20px;
+border-radius: 10px;
+width: 90%;
+max-width: 500px;
+box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+position: relative;
+text-align: center;
+}
+
+.close-btn {
+color: var(--gray-medium);
+float: left;
+font-size: 28px;
+font-weight: bold;
+}
+
+.close-btn:hover, .close-btn:focus {
+color: var(--text-color);
+text-decoration: none;
+cursor: pointer;
+}
+
+.payment-option {
+padding: 15px;
+border: 1px solid var(--gray-light);
+border-radius: 8px;
+margin-bottom: 15px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+cursor: pointer;
+transition: border-color 0.2s;
+}
+
+.payment-option:hover {
+border-color: var(--primary-color);
+}
+
+.payment-option i {
+font-size: 1.5rem;
+margin-left: 10px;
+}
+
+.payment-option span {
+font-weight: bold;
+flex-grow: 1;
+}
+
+.not-available {
+opacity: 0.5;
+cursor: not-allowed;
+}
+</style>
+</head>
+<body>
+
+<div class="bottom-navbar">
+<a href="reel.html" class="nav-item">
+<i class="fas fa-home"></i>
+<span>الرئيسية</span>
+</a>
+<a href="cart.html" class="nav-item active">
+<i class="fas fa-shopping-cart"></i>
+<span>السلة</span>
+</a>
+<a href="notes.html" class="nav-item">
+<i class="fas fa-plus-circle"></i>
+<span>ملاحظة</span>
+</a>
+<a href="account.html" class="nav-item">
+<i class="fas fa-user"></i>
+<span>الحساب</span>
+</a>
+</div>
+
+<div class="main-content">
+<h2>سلة المشتريات</h2>
+
+<div id="cart-items-container">
+</div>
+
+<p id="no-items-message" class="no-items-message" style="display: none;">سلتك فارغة حاليًا.</p>
+
+<div id="cart-summary" style="display: none;">
+<p><span>المجموع الفرعي:</span> <span id="subtotalPrice">0.00 JOD</span></p>
+<p class="total-price"><span>المجموع الكلي:</span> <span id="totalPrice">0.00 JOD</span></p>
+</div>
+
+<button class="checkout-btn" id="checkoutBtn" style="display: none;">
+تأكيد الشراء
+</button>
+</div>
+
+<div id="paymentModal" class="modal">
+<div class="modal-content">
+<span class="close-btn">&times;</span>
+<h3 style="text-align: right;">اختر طريقة الدفع</h3>
+<hr style="border: 1px solid var(--gray-light);">
+<div id="paymentOptionsContainer">
+<div class="payment-option">
+<i class="fab fa-paypal"></i>
+<span>PayPal</span>
+</div>
+<div class="payment-option">
+<i class="fas fa-hand-holding-usd"></i>
+<span>دفع عند الاستلام (الأردن فقط)</span>
+</div>
+<div class="payment-option not-available">
+<i class="fas fa-credit-card"></i>
+<span>Visa / Click (غير متوفر)</span>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+// JavaScript
+document.addEventListener('DOMContentLoaded', () => {
+const cartItemsContainer = document.getElementById('cart-items-container');
+const noItemsMessage = document.getElementById('no-items-message');
+const cartSummary = document.getElementById('cart-summary');
+const subtotalPriceSpan = document.getElementById('subtotalPrice');
+const totalPriceSpan = document.getElementById('totalPrice');
+const checkoutBtn = document.getElementById('checkoutBtn');
+const paymentModal = document.getElementById('paymentModal');
+const closeBtn = document.querySelector('.close-btn');
+
+const renderCart = () => {
+const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+cartItemsContainer.innerHTML = '';
+let subtotal = 0;
+
+if (cartItems.length === 0) {
+noItemsMessage.style.display = 'block';
+cartSummary.style.display = 'none';
+checkoutBtn.style.display = 'none';
+} else {
+noItemsMessage.style.display = 'none';
+cartSummary.style.display = 'block';
+checkoutBtn.style.display = 'block';
+
+cartItems.forEach(item => {
+const itemTotal = item.price * item.quantity;
+subtotal += itemTotal;
+
+const cartItemDiv = document.createElement('div');
+cartItemDiv.className = 'cart-item';
+cartItemDiv.innerHTML = `
+<img src="${item.images[0]}" alt="${item.name}" class="cart-item-image">
+<div class="cart-item-details">
+<h4 class="cart-item-name">${item.name}</h4>
+<p class="cart-item-price">${item.price} JOD</p>
+<div class="quantity-control">
+<button class="quantity-btn decrease-btn" data-id="${item.id}">-</button>
+<span class="quantity-display">${item.quantity}</span>
+<button class="quantity-btn increase-btn" data-id="${item.id}">+</button>
+</div>
+</div>
+<button class="remove-btn" data-id="${item.id}">
+<i class="fas fa-trash-alt"></i>
+</button>
+`;
+cartItemsContainer.appendChild(cartItemDiv);
+});
+
+// تحديث الأسعار
+subtotalPriceSpan.textContent = `${subtotal.toFixed(2)} JOD`;
+totalPriceSpan.textContent = `${subtotal.toFixed(2)} JOD`;
+}
+};
+
+// وظيفة تحديث الكمية وإزالة المنتج
+cartItemsContainer.addEventListener('click', (event) => {
+const target = event.target;
+const itemId = target.closest('[data-id]').dataset.id;
+let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+const itemIndex = cartItems.findIndex(item => item.id == itemId);
+
+if (target.closest('.increase-btn')) {
+cartItems[itemIndex].quantity += 1;
+} else if (target.closest('.decrease-btn')) {
+if (cartItems[itemIndex].quantity > 1) {
+cartItems[itemIndex].quantity -= 1;
+}
+} else if (target.closest('.remove-btn')) {
+if (confirm('هل أنت متأكد من إزالة هذا المنتج من السلة؟')) {
+cartItems.splice(itemIndex, 1);
+}
+}
+
+localStorage.setItem('cartItems', JSON.stringify(cartItems));
+renderCart();
+});
+
+// فتح النافذة المنبثقة لخيارات الدفع
+checkoutBtn.addEventListener('click', () => {
+paymentModal.style.display = "block";
+});
+
+// إغلاق النافذة المنبثقة
+closeBtn.addEventListener('click', () => {
+paymentModal.style.display = "none";
+});
+window.addEventListener('click', (event) => {
+if (event.target == paymentModal) {
+paymentModal.style.display = "none";
+}
+});
+
+// عرض محتويات السلة عند تحميل الصفحة
+renderCart();
+});
+</script>
+</body>
+</html>
+	
