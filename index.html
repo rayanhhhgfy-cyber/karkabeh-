@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>تسجيل الدخول - كركبه</title>
+<style>
+body { font-family: Arial; background: #f3f3f3; text-align: center; }
+.box { background: white; padding: 20px; margin: 100px auto; width: 300px; border-radius: 10px; }
+input { display: block; width: 100%; margin: 10px 0; padding: 10px; }
+button { padding: 10px; width: 100%; background: #222; color: white; border: none; cursor: pointer; }
+#support-btn { position: fixed; bottom: 20px; right: 20px; background: #444; color: white; padding: 10px 15px; border-radius: 8px; cursor: pointer; }
+#support-popup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border: 1px solid #ccc; border-radius: 10px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="box">
+<h2>تسجيل الدخول - كركبه</h2>
+<input type="email" id="email" placeholder="الإيميل">
+<input type="password" id="password" placeholder="كلمة السر">
+<button onclick="login()">دخول</button>
+<p>ما عندك حساب؟ <a href="signup.html">إنشاء حساب</a></p>
+</div>
+
+<div id="support-btn">التواصل مع الدعم الفني</div>
+<div id="support-popup">
+<p>تقدر تتواصل معنا على:</p>
+<p>📧 <a href="mailto:rayanaljamal550@gmail.com">rayanaljamal550@gmail.com</a></p>
+<p>📱 <a href="https://wa.me/962788809843">واتساب 0788809843</a></p>
+<button onclick="document.getElementById('support-popup').style.display='none'">إغلاق</button>
+</div>
+
+<script>
+async function login() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const res = await fetch("/api/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password })
+  });
+  const data = await res.json();
+  alert(data.message || data.error);
+}
+document.getElementById("support-btn").onclick = () => {
+  document.getElementById('support-popup').style.display='block';
+}
+</script>
+</body>
+</html>
