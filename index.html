@@ -2,47 +2,92 @@
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
-<title>تسجيل الدخول - كركبه</title>
+<title>إنشاء حساب - كركبه</title>
 <style>
-body { font-family: Arial; background: #f3f3f3; text-align: center; }
-.box { background: white; padding: 20px; margin: 100px auto; width: 300px; border-radius: 10px; }
-input { display: block; width: 100%; margin: 10px 0; padding: 10px; }
-button { padding: 10px; width: 100%; background: #222; color: white; border: none; cursor: pointer; }
-#support-btn { position: fixed; bottom: 20px; right: 20px; background: #444; color: white; padding: 10px 15px; border-radius: 8px; cursor: pointer; }
-#support-popup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border: 1px solid #ccc; border-radius: 10px; text-align: center; }
+body {
+  font-family: Arial, sans-serif;
+  background: #f3f4f6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+.container {
+  background: white;
+  padding: 40px 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  width: 350px;
+  text-align: center;
+}
+.container img {
+  width: 80px;
+  margin-bottom: 20px;
+}
+.container h2 {
+  margin-bottom: 25px;
+}
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  border: none;
+  border-radius: 8px;
+  background-color: #007bff;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+button:hover {
+  background-color: #0069d9;
+}
+p {
+  margin-top: 20px;
+  font-size: 14px;
+}
+p a {
+  color: #007bff;
+  text-decoration: none;
+}
+p a:hover {
+  text-decoration: underline;
+}
 </style>
 </head>
 <body>
-<div class="box">
-<h2>تسجيل الدخول - كركبه</h2>
-<input type="email" id="email" placeholder="الإيميل">
-<input type="password" id="password" placeholder="كلمة السر">
-<button onclick="login()">دخول</button>
-<p>ما عندك حساب؟ <a href="signup.html">إنشاء حساب</a></p>
-</div>
-
-<div id="support-btn">التواصل مع الدعم الفني</div>
-<div id="support-popup">
-<p>تقدر تتواصل معنا على:</p>
-<p>📧 <a href="mailto:rayanaljamal550@gmail.com">rayanaljamal550@gmail.com</a></p>
-<p>📱 <a href="https://wa.me/962788809843">واتساب 0788809843</a></p>
-<button onclick="document.getElementById('support-popup').style.display='none'">إغلاق</button>
+<div class="container">
+  <img src="logo.png" alt="شعار المتجر">
+  <h2>إنشاء حساب جديد</h2>
+  <input type="text" id="name" placeholder="الاسم الكامل">
+  <input type="email" id="email" placeholder="البريد الإلكتروني">
+  <input type="password" id="password" placeholder="كلمة المرور">
+  <button onclick="signup()">إنشاء الحساب</button>
+  <p>لديك حساب بالفعل؟ <a href="login.html">تسجيل الدخول</a></p>
 </div>
 
 <script>
-async function login() {
+async function signup() {
+  const name = document.getElementById("name").value;
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
-  const res = await fetch("/api/login", {
+
+  const res = await fetch("/api/signup", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ name, email, password })
   });
+
   const data = await res.json();
   alert(data.message || data.error);
-}
-document.getElementById("support-btn").onclick = () => {
-  document.getElementById('support-popup').style.display='block';
 }
 </script>
 </body>
