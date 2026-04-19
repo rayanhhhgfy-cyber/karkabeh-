@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "cockroachdb"
+  url      = env("DATABASE_URL")
+}
+
+model ProductImage {
+  id          String    @id @default(cuid())
+  image       String
+  createdAt   DateTime  @default(now())
+  description String?
+  hasBadge    Boolean   @default(false)
+  name        String
+  price       Float     @default(0.0)
+  comments    Comment[]
+}
+
+model Order {
+  id                String   @id @default(cuid())
+  customerName      String
+  customerEmail     String
+  customerPhone     String
+  customerAddress   String
+  deliveryDateTime  String
+  colorName         String
+  colorImageBase64  String?
+  customRefImage    String?
+  customDescription String?
+  size              String
+  quantity          Int
+  status            String   @default("pending")
+  language          String   @default("en")
+  isConfirmed       Boolean  @default(false)
+  otpCode           String
+  createdAt         DateTime @default(now())
+}
+
+model Comment {
+  id         String       @id @default(cuid())
+  productId  String
+  authorName String
+  message    String
+  createdAt  DateTime     @default(now())
+  product    ProductImage @relation(fields: [productId], references: [id])
+}

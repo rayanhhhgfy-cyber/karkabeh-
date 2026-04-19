@@ -31,52 +31,52 @@ export default function AdminPage() {
     { value: "cancelled", label: "Cancelled" },
   ];
 
-  const handleSeed = async () => {
-    if (confirm("This will add the initial Maroon, Gold, and Emerald bags for your review. Proceed?")) {
-      const res = await seedProducts();
-      if (res.success) {
-        alert(res.message);
-        loadData();
-      } else {
-        alert(res.error || "Seed failed");
-      }
-    }
-  };
+   const loadData = async () => {
+     if (activeTab === "products") {
+       const data = await getAdminProducts();
+       setProducts(data);
+     } else if (activeTab === "comments") {
+       const data = await getAdminComments();
+       setComments(data);
+     } else {
+       const data = await getConfirmedOrders(orderFilter);
+       setOrders(data);
+     }
+   };
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password === "konozbag/rama") {
-      setIsAuthenticated(true);
-      sessionStorage.setItem("admin_auth", "true");
-    } else {
-      alert("Invalid password");
-    }
-  };
+   const handleSeed = async () => {
+     if (confirm("This will add the initial Maroon, Gold, and Emerald bags for your review. Proceed?")) {
+       const res = await seedProducts();
+       if (res.success) {
+         alert(res.message);
+         await loadData();
+       } else {
+         alert(res.error || "Seed failed");
+       }
+     }
+   };
 
-  useEffect(() => {
-    if (sessionStorage.getItem("admin_auth") === "true") {
-      setIsAuthenticated(true);
-    }
-  }, []);
+   const handleLogin = (e: React.FormEvent) => {
+     e.preventDefault();
+     if (password === "konozbag/rama") {
+       setIsAuthenticated(true);
+       sessionStorage.setItem("admin_auth", "true");
+     } else {
+       alert("Invalid password");
+     }
+   };
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      loadData();
-    }
-  }, [isAuthenticated, activeTab, orderFilter]);
+   useEffect(() => {
+     if (sessionStorage.getItem("admin_auth") === "true") {
+       setIsAuthenticated(true);
+     }
+   }, []);
 
-  const loadData = async () => {
-    if (activeTab === "products") {
-      const data = await getAdminProducts();
-      setProducts(data);
-    } else if (activeTab === "comments") {
-      const data = await getAdminComments();
-      setComments(data);
-    } else {
-      const data = await getConfirmedOrders(orderFilter);
-      setOrders(data);
-    }
-  };
+   useEffect(() => {
+     if (isAuthenticated) {
+       loadData();
+     }
+   }, [isAuthenticated, activeTab, orderFilter, loadData]);
 
   const handleUpdateStatus = async (orderId: string, status: string) => {
     if (!orderId || !status) return;
