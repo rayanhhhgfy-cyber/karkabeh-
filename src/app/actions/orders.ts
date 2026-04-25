@@ -92,6 +92,7 @@ export async function createOrder(formData: any) {
         customDescription: formData.customDescription || null,
         size: String(formData.size || "M"),
         quantity,
+        deliveryMethod: String(formData.deliveryMethod || "delivery"),
         otpCode,
         isConfirmed: false,
         status: "pending",
@@ -168,7 +169,8 @@ export async function verifyOTP(orderId: string, otpInput: string) {
             <p><strong>Phone:</strong> ${escapeHTML(order.customerPhone)}</p>
             <p><strong>Email:</strong> ${escapeHTML(order.customerEmail)}</p>
             <p><strong>Address:</strong><br>${escapeHTML(order.customerAddress).replace(/\n/g, '<br>')}</p>
-            <p><strong>Delivery Info:</strong> ${escapeHTML(order.deliveryDateTime)}</p>
+            <p><strong>Method:</strong> ${order.deliveryMethod === 'pickup' ? 'PICK UP' : 'DELIVERY'}</p>
+            <p><strong>Delivery/Pickup Info:</strong> ${escapeHTML(order.deliveryDateTime)}</p>
           </div>
 
           <div style="background: #fdf2f2; padding: 20px; border-radius: 8px; margin: 20px 0;">
@@ -305,11 +307,16 @@ export async function getPublicProducts() {
   // Ensure we bypass build-time cache
   unstable_noStore();
   try {
-    return await prisma.productImage.findMany({
+    return await prisma.product.findMany({
       orderBy: { createdAt: "desc" },
+      include: {
+        images: true,
+        colors: true
+      }
     });
   } catch (error) {
     console.error("Critical: Failed to fetch products:", error);
     return [];
   }
 }
+

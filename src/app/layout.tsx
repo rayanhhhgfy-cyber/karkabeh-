@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Konoz Bag | Luxury Collection",
-  description: "Exquisite craftsmanship and premium leather bags. Hand-finished luxury for the modern wanderer.",
+  description: "Exquisite craftsmanship and premium handmade beaded bags. Hand-finished luxury for the modern wanderer.",
 };
 
 export default function RootLayout({

@@ -24,8 +24,20 @@ export default function ProductView({ initialProducts, activeId }: { initialProd
   const [selectedProduct, setSelectedProduct] = useState<any>(
     activeId === "custom" 
       ? null 
-      : (initialProducts.find(p => p.id === activeId) || initialProducts[0] || null)
+      : (initialProducts.find((p: any) => p.id === activeId) || initialProducts[0] || null)
   );
+
+  useEffect(() => {
+    setProducts(initialProducts);
+    const updatedSelected = activeId === "custom" 
+      ? null 
+      : (initialProducts.find((p: any) => p.id === (selectedProduct?.id || activeId)) || initialProducts[0] || null);
+    setSelectedProduct(updatedSelected);
+  }, [initialProducts, activeId]);
+
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [selectedColor, setSelectedColor] = useState<any>(null);
+
   const [size, setSize] = useState("M");
   const [quantity, setQuantity] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -41,6 +53,7 @@ export default function ProductView({ initialProducts, activeId }: { initialProd
     phone: "",
     address: "",
     deliveryTime: "",
+    deliveryMethod: "delivery",
   });
   const [language, setLanguage] = useState<"en" | "ar">("en");
 
@@ -62,14 +75,18 @@ export default function ProductView({ initialProducts, activeId }: { initialProd
 
     const res = await createOrder({
       ...formData,
-      colorName: isCustom ? `Custom: ${customColorName}` : selectedProduct.name,
-      colorImage: isCustom ? null : selectedProduct.image,
+      colorName: isCustom 
+        ? `Custom: ${customColorName}` 
+        : `${selectedProduct?.[language === "ar" ? "nameAr" : "nameEn"]} - ${selectedColor?.[language === "ar" ? "nameAr" : "nameEn"] || "Standard"}`,
+      colorImage: isCustom ? null : (selectedColor?.image || selectedProduct?.images?.[0]?.image),
       customRefImage: isCustom ? customRefImage : null,
       customDescription: isCustom ? customColorDescription : null,
       size,
       quantity,
+      deliveryMethod: formData.deliveryMethod,
       language,
     });
+
 
     if (res.success) {
       setOrderId(res.orderId!);
@@ -98,7 +115,11 @@ export default function ProductView({ initialProducts, activeId }: { initialProd
 
   useEffect(() => {
     loadComments();
-  }, [selectedProduct?.id]);
+    if (selectedProduct?.colors?.length > 0 && !selectedColor) {
+      setSelectedColor(selectedProduct.colors[0]);
+    }
+  }, [selectedProduct?.id, selectedProduct?.colors]);
+
 
   const handleCustomRefSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -177,11 +198,11 @@ export default function ProductView({ initialProducts, activeId }: { initialProd
 
   return (
     <div className="flex flex-col">
-      {/* Main Product Image Container */}
-      <div className="relative aspect-[4/5] w-full bg-gray-50 overflow-hidden shadow-2xl">
+      {/* Main Product Image Container with Gallery */}
+      <div className="relative aspect-[4/5] w-full bg-gray-50 overflow-hidden shadow-2xl group">
         <AnimatePresence mode="wait">
           <motion.div
-            key={isCustom ? "custom-preview" : selectedProduct?.id}
+            key={isCustom ? "custom-preview" : `${selectedProduct?.id}-${currentImageIndex}`}
             initial={{ opacity: 0, scale: 1.05 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
@@ -192,8 +213,8 @@ export default function ProductView({ initialProducts, activeId }: { initialProd
               <Image src={customRefImage} alt="Custom Reference" fill className="object-cover" />
             ) : (
               <Image 
-                src={selectedProduct?.image || "/assets/bag-maroon.png"} 
-                alt={selectedProduct?.name || "Product"} 
+                src={(currentImageIndex === 0 && selectedColor?.image) ? selectedColor.image : (selectedProduct?.images?.[currentImageIndex]?.image || "/assets/bag-maroon.png")} 
+                alt={selectedProduct?.[language === "ar" ? "nameAr" : "nameEn"] || "Product"} 
                 fill 
                 className="object-cover"
                 priority
@@ -201,32 +222,83 @@ export default function ProductView({ initialProducts, activeId }: { initialProd
             )}
           </motion.div>
         </AnimatePresence>
+
+        {/* Image Navigation Arrows */}
+        {!isCustom && selectedProduct?.images?.length > 1 && (
+          <>
+            <button 
+              onClick={() => setCurrentImageIndex((prev) => (prev === 0 ? selectedProduct.images.length - 1 : prev - 1))}
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <ChevronRight className="rotate-180" size={20} />
+            </button>
+            <button 
+              onClick={() => setCurrentImageIndex((prev) => (prev === selectedProduct.images.length - 1 ? 0 : prev + 1))}
+              className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </>
+        )}
         
-        <div className="absolute bottom-6 left-6 flex flex-col items-start gap-2">
-          <span className="text-white bg-maroon px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase shadow-xl">
-            {isCustom ? "Bespoke Request" : "In Stock"}
-          </span>
-          <h2 className="text-4xl font-bold text-white drop-shadow-lg tracking-tight italic">
-            Konoz Bag <span className="text-gold opacity-90">{isCustom ? "Custom" : selectedProduct?.name}</span>
+        {/* Gallery Dots */}
+        {!isCustom && selectedProduct?.images?.length > 1 && (
+          <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex gap-2">
+            {selectedProduct.images.map((_: any, idx: number) => (
+              <div 
+                key={idx} 
+                className={`w-1.5 h-1.5 rounded-full transition-all ${idx === currentImageIndex ? "bg-gold w-4" : "bg-white/50"}`}
+              />
+            ))}
+          </div>
+        )}
+        
+        <div className="absolute bottom-6 left-6 right-6 flex flex-col items-start gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-white bg-maroon px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase shadow-xl">
+              {isCustom ? t(language, "bespokeRequest") : t(language, "inStock")}
+            </span>
+
+            {language === "ar" && (
+              <button 
+                onClick={() => setLanguage("en")}
+                className="text-white/60 text-[10px] font-bold uppercase tracking-widest hover:text-white"
+              >
+                English
+              </button>
+            )}
+            {language === "en" && (
+              <button 
+                onClick={() => setLanguage("ar")}
+                className="text-white/60 text-[10px] font-bold uppercase tracking-widest hover:text-white"
+              >
+                العربية
+              </button>
+            )}
+          </div>
+          <h2 className="text-4xl font-bold text-white drop-shadow-lg tracking-tight italic" dir={language === "ar" ? "rtl" : "ltr"}>
+            Konoz Bag <span className="text-gold opacity-90">{isCustom ? (language === "ar" ? "مخصص" : "Custom") : (selectedProduct?.[language === "ar" ? "nameAr" : "nameEn"])}</span>
           </h2>
         </div>
       </div>
 
+
       {/* Product Interaction Area */}
-      <div className="px-6 py-8">
+      <div className="px-6 py-8" dir={language === "ar" ? "rtl" : "ltr"}>
         {/* Description Section */}
-        {!isCustom && selectedProduct?.description && (
+        {!isCustom && selectedProduct?.[language === "ar" ? "descriptionAr" : "descriptionEn"] && (
           <div className="mb-8">
-            <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-gold mb-2">The Story</h3>
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-gold mb-2">{t(language, "theStory")}</h3>
             <p className="text-sm text-gray-600 leading-relaxed italic font-serif">
-              "{selectedProduct.description}"
+              "{selectedProduct[language === "ar" ? "descriptionAr" : "descriptionEn"]}"
             </p>
           </div>
         )}
 
+
         {!isCustom && selectedProduct?.price != null && (
           <div className="mb-8 flex items-center gap-3 text-sm text-gray-700">
-            <span className="font-semibold uppercase tracking-[0.2em]">Price</span>
+            <span className="font-semibold uppercase tracking-[0.2em]">{t(language, "priceTag")}</span>
             <span className="text-maroon font-bold text-xl">${selectedProduct.price.toFixed(2)}</span>
           </div>
         )}
@@ -234,33 +306,31 @@ export default function ProductView({ initialProducts, activeId }: { initialProd
         {/* Color Selection */}
         <div className="mb-10">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400">Color Variants</h3>
+            <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400">{t(language, "colorVariants")}</h3>
             <span className="text-sm font-semibold text-maroon italic">
-              {isCustom ? "Bespoke Selection" : selectedProduct?.name}
+              {isCustom ? t(language, "bespokeRequest") : (selectedColor?.[language === "ar" ? "nameAr" : "nameEn"] || t(language, "selectColor"))}
             </span>
           </div>
+
           <div className="flex flex-wrap gap-4">
-            {products.map((p) => (
+            {selectedProduct?.colors?.map((c: any) => (
               <button
-                key={p.id}
+                key={c.id}
                 onClick={() => {
-                  setSelectedProduct(p);
+                  setSelectedColor(c);
                   setIsCustom(false);
+                  setCurrentImageIndex(0);
                 }}
-                className={`relative w-16 h-16 rounded-2xl overflow-hidden transition-all active:scale-95 ${
-                  !isCustom && selectedProduct?.id === p.id 
-                    ? "ring-4 ring-maroon ring-offset-2 scale-105 z-10 shadow-lg" 
-                    : "ring-1 ring-gray-200 opacity-70 hover:opacity-100"
+                className={`relative px-4 py-2 rounded-2xl transition-all active:scale-95 border-2 ${
+                  !isCustom && selectedColor?.id === c.id 
+                    ? "border-maroon bg-maroon/5 text-maroon font-bold scale-105 shadow-md" 
+                    : "border-gray-100 text-gray-400 hover:border-gray-200"
                 }`}
               >
-                <Image src={p.image} alt={p.name} fill className="object-cover" />
-                {p.hasBadge && (
-                  <div className="absolute top-1 right-1 bg-orange-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full shadow-sm animate-pulse">
-                    96.3% g
-                  </div>
-                )}
+                <span className="text-xs">{c[language === "ar" ? "nameAr" : "nameEn"]}</span>
               </button>
             ))}
+
             
             {/* Custom Color Button */}
             <button
@@ -285,33 +355,34 @@ export default function ProductView({ initialProducts, activeId }: { initialProd
             className="mb-10 p-5 bg-gold/5 border border-gold/20 rounded-3xl space-y-4"
           >
             <div>
-              <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-2 block">Desired Color Name</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-2 block">{t(language, "desiredColorName")}</label>
               <input 
                 type="text" 
-                placeholder="e.g. Midnight Navy"
+                placeholder={language === "ar" ? "مثال: أزرق ملكي" : "e.g. Midnight Navy"}
                 value={customColorName}
                 onChange={(e) => setCustomColorName(e.target.value)}
                 className="w-full px-4 py-3 bg-white border border-gold/20 rounded-xl outline-none focus:ring-2 focus:ring-gold text-sm font-medium"
               />
             </div>
             <div>
-              <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-2 block">Special Instructions / Description</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-2 block">{t(language, "specialInstructions")}</label>
               <textarea 
-                placeholder="Describe your vision (e.g. contrast stitching, specific interior fabric...)"
+                placeholder={language === "ar" ? "صف رؤيتك (مثال: خياطة متباينة، قماش داخلي محدد...)" : "Describe your vision (e.g. contrast stitching, specific interior fabric...)"}
                 value={customColorDescription}
                 onChange={(e) => setCustomColorDescription(e.target.value)}
                 className="w-full px-4 py-3 bg-white border border-gold/20 rounded-xl outline-none focus:ring-2 focus:ring-gold text-sm font-medium h-24 resize-none"
               />
             </div>
             <div>
-              <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-2 block">Reference Photo (Optional)</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-gold mb-2 block">{t(language, "referenceImage")}</label>
+
               <div className="relative h-20 bg-white border-2 border-dashed border-gold/20 rounded-xl flex items-center justify-center group overflow-hidden">
                 {customRefImage ? (
-                  <Image src={customRefImage} alt="Ref" fill className="object-cover" />
+                   <Image src={customRefImage} alt="Ref" fill className="object-cover" />
                 ) : (
                   <div className="flex items-center gap-3">
                     <ImageIcon size={20} className="text-gold/50" />
-                    <span className="text-xs font-bold text-gold/50 uppercase">Tap to upload</span>
+                    <span className="text-xs font-bold text-gold/50 uppercase">{language === "ar" ? "اضغط للتحميل" : "Tap to upload"}</span>
                   </div>
                 )}
                 <input 
@@ -325,11 +396,12 @@ export default function ProductView({ initialProducts, activeId }: { initialProd
           </motion.div>
         )}
 
+
         {/* Size Selection */}
         <div className="mb-10">
           <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400 mb-4">Select Size</h3>
           <div className="grid grid-cols-3 gap-3">
-            {["S", "M", "L"].map((s) => (
+            {(selectedProduct?.sizes ? selectedProduct.sizes.split(",").map((s: string) => s.trim()) : ["S", "M", "L"]).map((s: string) => (
               <button
                 key={s}
                 onClick={() => setSize(s)}
@@ -368,9 +440,11 @@ export default function ProductView({ initialProducts, activeId }: { initialProd
             className="flex-grow luxury-gradient text-white py-5 rounded-2xl font-bold flex items-center justify-center gap-3 shadow-xl shadow-maroon/20 active:scale-[0.98] transition-all"
           >
             <ShoppingBag size={20} />
-            <span>Express Checkout</span>
-            <ChevronRight size={18} className="opacity-50" />
+            <span>{t(language, "expressCheckout")}</span>
+            <ChevronRight size={18} className={`opacity-50 ${language === "ar" ? "rotate-180" : ""}`} />
           </button>
+
+
         </div>
 
         {/* Benefits */}
@@ -380,8 +454,8 @@ export default function ProductView({ initialProducts, activeId }: { initialProd
               <ShieldCheck size={18} />
             </div>
             <div>
-              <p className="text-[11px] font-bold text-gray-900 uppercase tracking-wider">Premium Quality</p>
-              <p className="text-[10px] text-gray-500 leading-tight mt-0.5">Handpicked materials for luxury durability.</p>
+              <p className="text-[11px] font-bold text-gray-900 uppercase tracking-wider">{t(language, "premiumQuality")}</p>
+              <p className="text-[10px] text-gray-500 leading-tight mt-0.5">{t(language, "premiumQualityDesc")}</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
@@ -389,10 +463,12 @@ export default function ProductView({ initialProducts, activeId }: { initialProd
               <Truck size={18} />
             </div>
             <div>
-              <p className="text-[11px] font-bold text-gray-900 uppercase tracking-wider">Fast Delivery</p>
-              <p className="text-[10px] text-gray-500 leading-tight mt-0.5">Dispatched within 24 hours of verification.</p>
+              <p className="text-[11px] font-bold text-gray-900 uppercase tracking-wider">{t(language, "fastDelivery")}</p>
+              <p className="text-[10px] text-gray-500 leading-tight mt-0.5">{t(language, "fastDeliveryDesc")}</p>
             </div>
           </div>
+
+
         </div>
 
         {selectedProduct && (
@@ -556,15 +632,47 @@ export default function ProductView({ initialProducts, activeId }: { initialProd
                         />
                       </div>
                       <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-1">{t(language, "deliveryTime")}</label>
-                        <input 
-                          required 
-                          placeholder={language === "ar" ? "مثال: الاثنين صباحًا" : "e.g. Next Monday AM"}
-                          value={formData.deliveryTime}
-                          onChange={e => setFormData({...formData, deliveryTime: e.target.value})}
-                          className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-maroon outline-none text-sm transition-all"
-                        />
+                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-1">How to receive?</label>
+                        <div className="grid grid-cols-2 gap-1 mt-0.5">
+                          <button
+                            type="button"
+                            onClick={() => setFormData({...formData, deliveryMethod: "delivery"})}
+                            className={`py-2 rounded-lg border text-[10px] font-bold transition-all flex items-center justify-center gap-1 ${
+                              formData.deliveryMethod === "delivery" 
+                                ? "border-maroon bg-maroon/5 text-maroon" 
+                                : "border-gray-100 text-gray-400"
+                            }`}
+                          >
+                            <Truck size={10} />
+                            Delivery
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setFormData({...formData, deliveryMethod: "pickup"})}
+                            className={`py-2 rounded-lg border text-[10px] font-bold transition-all flex items-center justify-center gap-1 ${
+                              formData.deliveryMethod === "pickup" 
+                                ? "border-maroon bg-maroon/5 text-maroon" 
+                                : "border-gray-100 text-gray-400"
+                            }`}
+                          >
+                            <ShoppingBag size={10} />
+                            Pick up
+                          </button>
+                        </div>
                       </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-1">
+                        {formData.deliveryMethod === 'pickup' ? 'Preferred Pick up Date/Time' : t(language, "preferredDelivery")}
+                      </label>
+                      <input 
+                        required 
+                        placeholder={language === "ar" ? "مثال: الاثنين صباحًا" : "e.g. Next Monday AM"}
+                        value={formData.deliveryTime}
+                        onChange={e => setFormData({...formData, deliveryTime: e.target.value})}
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-maroon outline-none text-sm transition-all"
+                      />
                     </div>
 
                     <div className="space-y-1">
