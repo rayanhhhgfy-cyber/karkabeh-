@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "cockroachdb"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id            String         @id @default(cuid())
+  nameEn        String
+  nameAr        String
+  descriptionEn String?
+  descriptionAr String?
+  price         Float          @default(0.0)
+  hasBadge      Boolean        @default(false)
+  sizes         String         @default("S, M, L")
+  createdAt     DateTime       @default(now())
+  images        ProductImage[]
+  colors        ProductColor[]
+  comments      Comment[]
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  image     String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model ProductColor {
+  id        String   @id @default(cuid())
+  productId String
+  nameEn    String
+  nameAr    String
+  image     String?
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+  id                String   @id @default(cuid())
+  customerName      String
+  customerEmail     String
+  customerPhone     String
+  customerAddress   String
+  deliveryDateTime  String
+  colorName         String
+  colorImageBase64  String?
+  customRefImage    String?
+  customDescription String?
+  size              String
+  quantity          Int
+  deliveryMethod    String   @default("delivery")
+  status            String   @default("pending")
+  language          String   @default("en")
+  isConfirmed       Boolean  @default(false)
+  otpCode           String
+  createdAt         DateTime @default(now())
+}
+
+model Comment {
+  id         String   @id @default(cuid())
+  productId  String
+  authorName String
+  message    String
+  createdAt  DateTime @default(now())
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
